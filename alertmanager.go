@@ -60,7 +60,7 @@ func getActiveSilences(silences []AlertmanagerSilence) ([]AlertmanagerSilence, e
 		}
 	}
 	if len(activeSilences) > 0 {
-		log.Debug("Found active silences:")
+		log.Debug("Found active silences in Alert Manager:")
 		sPretty, err := json.MarshalIndent(activeSilences, "", "    ")
 		if err != nil {
 			return nil, err

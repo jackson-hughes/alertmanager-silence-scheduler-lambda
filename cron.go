@@ -7,9 +7,9 @@ import (
 )
 
 // testing cron string: 30 * * * *
-func parseCronSchedule() (time.Time, error) {
-	testString := "30 * * * *"
-	s, err := cron.ParseStandard(testString)
+func parseCronSchedule(c string) (time.Time, error) {
+	// c = "0 4 * * 0" // test string
+	s, err := cron.ParseStandard(c)
 	if err != nil {
 		return time.Time{}, err
 	}

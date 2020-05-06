@@ -10,7 +10,7 @@ func init() {
 	log.SetFormatter(&log.TextFormatter{
 		DisableLevelTruncation: true,
 		FullTimestamp:          true,
-		TimestampFormat:        "02-01-2006 15:04:05",
+		TimestampFormat:        "2006-02-01 15:04:05",
 	})
 	envLogLevel, set := os.LookupEnv("LOG_LEVEL")
 	if set {

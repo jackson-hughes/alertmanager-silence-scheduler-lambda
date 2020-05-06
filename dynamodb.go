@@ -1,6 +1,9 @@
 package main
 
 import (
+	"encoding/json"
+	"time"
+
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	log "github.com/sirupsen/logrus"
 
@@ -11,12 +14,16 @@ import (
 )
 
 type Record struct {
-	GroupName string
-	StackSets []string
+	Service           string
+	StartScheduleCron string
+	EndScheduleCron   string
+	Matchers          []string
+	StartsAt          time.Time
+	EndsAt            time.Time
 }
 
-func getScheduledSilences() {
-	scheduleTableName := "IAM_Group_Role_Mappings"
+func getScheduledSilences() ([]Record, error) {
+	scheduleTableName := "Alertmanager-Scheduled-Silences"
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
@@ -41,16 +48,35 @@ func getScheduledSilences() {
 			default:
 				log.Error(aerr.Error())
 			}
-		} else {
-			log.Error(err.Error())
 		}
-		return
+		return nil, err
 	}
-	log.Debug(result)
+	log.Debug("found the following records in DynamoDB:\n", result)
+
 	records := []Record{}
-	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &records)
+	if err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &records); err != nil {
+		return nil, err
+	}
+
+	for i := 0; i < len(records); i++ {
+		r := &records[i]
+		startTime, err := parseCronSchedule(r.StartScheduleCron)
+		if err != nil {
+			log.Error(err)
+		}
+		r.StartsAt = startTime
+		endTime, err := parseCronSchedule(r.EndScheduleCron)
+		if err != nil {
+			log.Error(err)
+		}
+		r.EndsAt = endTime
+	}
+
+	recordsPretty, err := json.MarshalIndent(records, "", "    ")
 	if err != nil {
 		log.Error(err)
 	}
-	log.Debugf("%+v", records)
+
+	log.Debug("Records:\n", string(recordsPretty))
+	return records, nil
 }
