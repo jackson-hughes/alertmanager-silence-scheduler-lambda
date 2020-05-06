@@ -19,11 +19,12 @@ func init() {
 			log.Error(err)
 		}
 		log.SetLevel(envLogLevelString)
-		log.Debug("found log level environment variable: ", envLogLevelString)
+		log.Debug("log level environment variable found: ", envLogLevel)
 	}
 
 	envAlertmanagerUrl, set := os.LookupEnv("ALERTMANAGER_URL")
 	if set {
 		alertmanagerBaseUrl = envAlertmanagerUrl
+		log.Debug("alertmanager url environment variable found: ", envAlertmanagerUrl)
 	}
 }
