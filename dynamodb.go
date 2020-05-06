@@ -17,7 +17,7 @@ type Record struct {
 	Service           string
 	StartScheduleCron string
 	EndScheduleCron   string
-	Matchers          []string
+	Matchers          []Matcher
 	StartsAt          time.Time
 	EndsAt            time.Time
 }
