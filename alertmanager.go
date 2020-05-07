@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -30,6 +31,18 @@ type AlertmanagerSilence struct {
 	Matchers  []Matcher `json:"matchers"`
 }
 
+func putSilence(s AlertmanagerSilence) error {
+	apiUrl := alertmanagerBaseUrl + silencesApiUrl // dupe clean up later
+	b, err := json.MarshalIndent(s, "", "    ")
+	log.Debugf("posting new silence to alert manager:\n", string(b))
+	resp, err := http.Post("http://"+apiUrl, "application/json", bytes.NewBuffer(b))
+	if err != nil {
+		log.Error(err)
+	}
+	log.Info(resp)
+	return nil
+}
+
 func getSilences() ([]AlertmanagerSilence, error) {
 	apiUrl := alertmanagerBaseUrl + silencesApiUrl
 
@@ -55,7 +68,7 @@ func getSilences() ([]AlertmanagerSilence, error) {
 func getActiveSilences(silences []AlertmanagerSilence) ([]AlertmanagerSilence, error) {
 	var activeSilences []AlertmanagerSilence
 	for _, s := range silences {
-		if s.Status.State == "active" {
+		if s.Status.State == "active" || s.Status.State == "pending" {
 			activeSilences = append(activeSilences, s)
 		}
 	}

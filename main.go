@@ -1,6 +1,9 @@
 package main
 
 import (
+	"sort"
+	"strings"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -32,6 +35,12 @@ func main() {
 	if s != nil {
 		log.Infof("New silences to be added to alert manager: %+v", s)
 	}
+
+	for _, v := range s {
+		if err := putSilence(v); err != nil {
+			log.Error(err)
+		}
+	}
 }
 
 func compare(a []AlertmanagerSilence, d []Record) ([]AlertmanagerSilence, error) {
@@ -39,35 +48,65 @@ func compare(a []AlertmanagerSilence, d []Record) ([]AlertmanagerSilence, error)
 	newSilences := []AlertmanagerSilence{}
 
 	// for each silence in dynamo collection
-	// check if it's in alert manager
-	// if not - post it - otherwise, continue
+	//	 check if it's in alert manager
+	//	 if not - post it - otherwise, continue
 
-	for di, dv := range d {
-		for ai, av := range a {
-			if dv.Matchers[di].Name != av.Matchers[ai].Name {
-				newSilence := AlertmanagerSilence{
-					CreatedBy: "automated-tooling",
-					Comment:   "silencing for regular maintenance",
-					StartsAt:  dv.StartsAt,
-					EndsAt:    dv.EndsAt,
-					Matchers:  dv.Matchers,
-				}
-				newSilences = append(newSilences, newSilence)
-			} else {
-				if dv.Matchers[di].Value != av.Matchers[ai].Value {
-					newSilence := AlertmanagerSilence{
-						CreatedBy: "automated-tooling",
-						Comment:   "silencing for regular maintenance",
-						StartsAt:  dv.StartsAt,
-						EndsAt:    dv.EndsAt,
-						Matchers:  dv.Matchers,
-					}
-					newSilences = append(newSilences, newSilence)
-				} else {
-					continue
-				}
+	for _, dv := range d {
+		found := false
+		for _, v := range a {
+			if matchersCompare(dv.Matchers, v.Matchers) {
+				log.Info("Alertmanager and DynamoDB are synchronised. Nothing to do.")
+				found = true
 			}
 		}
+		if !found {
+			log.Debug("Didn't find existing silence - creating a new silence for: ", dv.Matchers)
+			s := AlertmanagerSilence{
+				Comment:   "Silencing for regular maintenance window",
+				CreatedBy: "MSO Automated Tooling",
+				StartsAt:  dv.StartsAt,
+				EndsAt:    dv.EndsAt,
+				Matchers:  dv.Matchers,
+			}
+			newSilences = append(newSilences, s)
+		}
 	}
+
 	return newSilences, nil
+}
+
+// takes matcher and returns it matcher with sorted key values
+func sortMatchers(m []Matcher) {
+	sort.SliceStable(m,
+		func(i, j int) bool {
+			result := strings.Compare(m[i].Name, m[j].Name)
+			if result == -1 {
+				return false
+			}
+			return true
+		})
+}
+
+// true means matchers are equal - false means they are not
+func matchersCompare(a, d []Matcher) bool {
+
+	if len(a) != len(d) {
+		return false
+	}
+
+	sortMatchers(a)
+	sortMatchers(d)
+
+	for i, _ := range a {
+		if a[i].IsRegex != d[i].IsRegex {
+			return false
+		}
+		if a[i].Name != d[i].Name {
+			return false
+		}
+		if a[i].Value != d[i].Value {
+			return false
+		}
+	}
+	return true
 }
