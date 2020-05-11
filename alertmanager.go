@@ -86,6 +86,6 @@ func putSilence(s AlertmanagerSilence) error {
 	}
 	log.Debug("alertmanager response code: ", resp.Status)
 	log.Debug("alertmanager response body: ", resp.Body)
-	resp.Body.Close()
+	defer resp.Body.Close()
 	return nil
 }
