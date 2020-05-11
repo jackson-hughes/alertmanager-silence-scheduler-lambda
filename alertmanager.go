@@ -31,18 +31,6 @@ type AlertmanagerSilence struct {
 	Matchers  []Matcher `json:"matchers"`
 }
 
-func putSilence(s AlertmanagerSilence) error {
-	apiUrl := alertmanagerBaseUrl + silencesApiUrl // dupe clean up later
-	b, err := json.MarshalIndent(s, "", "    ")
-	log.Debugf("posting new silence to alert manager:\n", string(b))
-	resp, err := http.Post("http://"+apiUrl, "application/json", bytes.NewBuffer(b))
-	if err != nil {
-		log.Error(err)
-	}
-	log.Info(resp)
-	return nil
-}
-
 func getSilences() ([]AlertmanagerSilence, error) {
 	apiUrl := alertmanagerBaseUrl + silencesApiUrl
 
@@ -85,4 +73,19 @@ func getActiveSilences(silences []AlertmanagerSilence) ([]AlertmanagerSilence, e
 	return activeSilences, nil
 }
 
-func handleRecurringSilence() {}
+func putSilence(s AlertmanagerSilence) error {
+	apiUrl := alertmanagerBaseUrl + silencesApiUrl // dupe clean up later
+
+	b, err := json.MarshalIndent(s, "", "    ")
+
+	log.Debug("posting new silence to alert manager:\n", string(b))
+
+	resp, err := http.Post("http://"+apiUrl, "application/json", bytes.NewBuffer(b))
+	if err != nil {
+		return err
+	}
+	log.Debug("alertmanager response code: ", resp.Status)
+	log.Debug("alertmanager response body: ", resp.Body)
+	resp.Body.Close()
+	return nil
+}
