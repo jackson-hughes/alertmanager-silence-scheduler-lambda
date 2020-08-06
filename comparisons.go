@@ -7,25 +7,25 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// takes matcher and returns matcher with sorted key values
+// sortMatchers takes matcher and returns matcher with sorted key values
 func sortMatchers(m []Matcher) {
 	sort.SliceStable(m,
 		func(i, j int) bool {
 			result := strings.Compare(m[i].Name, m[j].Name)
-			if result == -1 {
+			if result == 1 {
 				return false
 			}
 			return true
 		})
 }
 
-// compares dynamo db records to alert manager records
-func compare(a []AlertmanagerSilence, d []Record) ([]AlertmanagerSilence, error) {
+// compareSilences compares dynamo db records to alert manager records
+func compareSilences(a []AlertmanagerSilence, d []Record) []AlertmanagerSilence {
 	newSilences := []AlertmanagerSilence{}
 
-	// for each silence in dynamo collection
-	// check if it's in alert manager
-	// if not - add to newSilences list - otherwise, continue
+	/* for each silence in dynamo slice
+	   check if it's in alert manager slice
+	   if not - add to newSilences list - otherwise, continue */
 
 	for _, dv := range d {
 		found := false
@@ -39,17 +39,17 @@ func compare(a []AlertmanagerSilence, d []Record) ([]AlertmanagerSilence, error)
 			log.Debug("Didn't find existing silence - creating a new silence for: ", dv.Matchers)
 			newSilences = append(newSilences, AlertmanagerSilence{
 				Comment:   "Silencing for regular maintenance window",
-				CreatedBy: "MSO Automated Tooling",
+				CreatedBy: "Silence Scheduler Lambda",
 				StartsAt:  dv.StartsAt,
 				EndsAt:    dv.EndsAt,
 				Matchers:  dv.Matchers,
 			})
 		}
 	}
-	return newSilences, nil
+	return newSilences
 }
 
-// true means matchers are equal - false means they are not
+// matchersCompare tests if two slices of matchers are equal. True is equal - false is not
 func matchersCompare(a, d []Matcher) bool {
 
 	if len(a) != len(d) {
@@ -64,7 +64,7 @@ func matchersCompare(a, d []Matcher) bool {
 	sortMatchers(d)
 	log.Trace("DynamoDB matcher after sort:\n", a)
 
-	for i, _ := range a {
+	for i := range a {
 		if a[i].IsRegex != d[i].IsRegex {
 			return false
 		}
