@@ -31,6 +31,7 @@ type AlertmanagerSilence struct {
 	Matchers  []Matcher `json:"matchers"`
 }
 
+// getSilences retrieves all silences from AlertManager
 func getSilences() ([]AlertmanagerSilence, error) {
 	apiUrl := alertmanagerBaseUrl + silencesApiUrl
 
@@ -53,6 +54,7 @@ func getSilences() ([]AlertmanagerSilence, error) {
 	return getActiveSilences(allSilences)
 }
 
+// getActiveSilences sorts through a slice of AlertManager silences removing any that have expired
 func getActiveSilences(silences []AlertmanagerSilence) ([]AlertmanagerSilence, error) {
 	var activeSilences []AlertmanagerSilence
 	for _, s := range silences {
@@ -73,13 +75,13 @@ func getActiveSilences(silences []AlertmanagerSilence) ([]AlertmanagerSilence, e
 	return activeSilences, nil
 }
 
+// putSilence takes an AlertManager silence and PUTs it into Alertmanager over http
 func putSilence(s AlertmanagerSilence) error {
 	apiUrl := alertmanagerBaseUrl + silencesApiUrl // dupe clean up later
 
 	b, err := json.MarshalIndent(s, "", "    ")
 
 	log.Debug("posting new silence to alert manager:\n", string(b))
-
 	resp, err := http.Post("http://"+apiUrl, "application/json", bytes.NewBuffer(b))
 	if err != nil {
 		return err

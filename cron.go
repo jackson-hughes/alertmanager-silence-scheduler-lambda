@@ -6,12 +6,10 @@ import (
 	"github.com/robfig/cron"
 )
 
-// testing cron string: 30 * * * *
-func parseCronSchedule(c string) (time.Time, error) {
-	// c = "0 4 * * 0" // test string
+func parseCronSchedule(c string, startTime time.Time) (time.Time, error) {
 	s, err := cron.ParseStandard(c)
 	if err != nil {
 		return time.Time{}, err
 	}
-	return s.Next(time.Now().UTC()), nil // this provides when silence start
+	return s.Next(startTime), nil // this provides when silence start
 }

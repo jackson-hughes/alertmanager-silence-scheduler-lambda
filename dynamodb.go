@@ -51,7 +51,7 @@ func getScheduledSilences() ([]Record, error) {
 		}
 		return nil, err
 	}
-	log.Debug("found the following records in DynamoDB:\n", result)
+	log.Debug("found records in DynamoDB:\n", result)
 
 	records := []Record{}
 	if err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &records); err != nil {
@@ -60,12 +60,12 @@ func getScheduledSilences() ([]Record, error) {
 
 	for i := 0; i < len(records); i++ {
 		r := &records[i]
-		startTime, err := parseCronSchedule(r.StartScheduleCron)
+		startTime, err := parseCronSchedule(r.StartScheduleCron, time.Now().UTC())
 		if err != nil {
 			log.Error(err)
 		}
 		r.StartsAt = startTime
-		endTime, err := parseCronSchedule(r.EndScheduleCron)
+		endTime, err := parseCronSchedule(r.EndScheduleCron, time.Now().UTC())
 		if err != nil {
 			log.Error(err)
 		}
