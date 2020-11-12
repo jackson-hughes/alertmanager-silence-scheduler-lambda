@@ -66,7 +66,7 @@ func TestHandleRequest(t *testing.T) {
 	handleRequest(context.TODO(), testEvent)
 
 	// query alertmanager for silences
-	resp, err := http.Get("http://" + alertManagerUrl)
+	resp, err := http.Get("http://" + alertManagerURL)
 	if err != nil {
 		t.Error(err)
 	}
@@ -76,7 +76,7 @@ func TestHandleRequest(t *testing.T) {
 	}
 
 	// unmarshall the alert manager response
-	actualAlerts := []AlertmanagerSilence{}
+	actualAlerts := []alertmanagerSilence{}
 	err = json.Unmarshal(responseBody, &actualAlerts)
 	if err != nil {
 		t.Error(err)

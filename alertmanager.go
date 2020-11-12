@@ -10,41 +10,41 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Status struct {
+type status struct {
 	State string `json:"state"`
 }
 
-type Matcher struct {
+type matcher struct {
 	IsRegex bool   `json:"isRegex"`
 	Name    string `json:"name"`
 	Value   string `json:"value"`
 }
 
-type ScheduledSilence struct {
+type scheduledSilence struct {
 	Service           string
 	StartScheduleCron string
 	EndScheduleCron   string
-	Matchers          []Matcher
+	Matchers          []matcher
 	StartsAt          time.Time
 	EndsAt            time.Time
 }
 
-type AlertmanagerSilence struct {
-	Id        string    `json:"id"`
-	Status    Status    `json:"status"`
+type alertmanagerSilence struct {
+	ID        string    `json:"id"`
+	Status    status    `json:"status"`
 	Comment   string    `json:"comment"`
 	CreatedBy string    `json:"createdBy"`
 	StartsAt  time.Time `json:"startsAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 	EndsAt    time.Time `json:"endsAt"`
-	Matchers  []Matcher `json:"matchers"`
+	Matchers  []matcher `json:"matchers"`
 }
 
 // getSilences retrieves all silences from AlertManager
-func getSilences(alertManagerUrl string) ([]AlertmanagerSilence, error) {
-	var allSilences []AlertmanagerSilence // existing silences includes all states (e.g. expired)
+func getSilences(alertManagerURL string) ([]alertmanagerSilence, error) {
+	var allSilences []alertmanagerSilence // existing silences includes all states (e.g. expired)
 
-	resp, err := http.Get("http://" + alertManagerUrl)
+	resp, err := http.Get("http://" + alertManagerURL)
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +62,8 @@ func getSilences(alertManagerUrl string) ([]AlertmanagerSilence, error) {
 }
 
 // getActiveSilences sorts through a slice of AlertManager silences removing any that have expired
-func getActiveSilences(silences []AlertmanagerSilence) ([]AlertmanagerSilence, error) {
-	var activeSilences []AlertmanagerSilence
+func getActiveSilences(silences []alertmanagerSilence) ([]alertmanagerSilence, error) {
+	var activeSilences []alertmanagerSilence
 	for _, s := range silences {
 		if s.Status.State == "active" || s.Status.State == "pending" {
 			activeSilences = append(activeSilences, s)
@@ -83,11 +83,11 @@ func getActiveSilences(silences []AlertmanagerSilence) ([]AlertmanagerSilence, e
 }
 
 // putSilence takes an AlertManager silence and PUTs it into Alertmanager over http
-func putSilence(alertManagerUrl string, s AlertmanagerSilence) error {
+func putSilence(alertManagerURL string, s alertmanagerSilence) error {
 	b, err := json.MarshalIndent(s, "", "    ")
 
 	log.Debug("posting new silence to alert manager:\n", string(b))
-	resp, err := http.Post("http://"+alertManagerUrl, "application/json", bytes.NewBuffer(b))
+	resp, err := http.Post("http://"+alertManagerURL, "application/json", bytes.NewBuffer(b))
 	if err != nil {
 		return err
 	}

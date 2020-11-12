@@ -6,13 +6,13 @@ import (
 )
 
 func TestSortMatchers(t *testing.T) {
-	testMatchers := []Matcher{
+	testMatchers := []matcher{
 		{Name: "G"},
 		{Name: "Z"},
 		{Name: "A"},
 	}
 
-	expected := []Matcher{
+	expected := []matcher{
 		{Name: "A"},
 		{Name: "G"},
 		{Name: "Z"},
@@ -27,12 +27,12 @@ func TestSortMatchers(t *testing.T) {
 
 func TestMatchersCompare(t *testing.T) {
 	t.Run("unequal slices", func(t *testing.T) {
-		a := []Matcher{
+		a := []matcher{
 			{Name: "a"},
 			{Name: "b"},
 		}
 
-		b := []Matcher{
+		b := []matcher{
 			{Name: "a"},
 		}
 
@@ -42,11 +42,11 @@ func TestMatchersCompare(t *testing.T) {
 		}
 	})
 	t.Run("regex false", func(t *testing.T) {
-		a := []Matcher{
+		a := []matcher{
 			{IsRegex: false, Name: "a"},
 		}
 
-		b := []Matcher{
+		b := []matcher{
 			{IsRegex: true, Name: "a"},
 		}
 
@@ -57,11 +57,11 @@ func TestMatchersCompare(t *testing.T) {
 	})
 
 	t.Run("name false", func(t *testing.T) {
-		a := []Matcher{
+		a := []matcher{
 			{IsRegex: false, Name: "a"},
 		}
 
-		b := []Matcher{
+		b := []matcher{
 			{IsRegex: false, Name: "b"},
 		}
 
@@ -72,10 +72,10 @@ func TestMatchersCompare(t *testing.T) {
 	})
 
 	t.Run("value false", func(t *testing.T) {
-		a := []Matcher{
+		a := []matcher{
 			{IsRegex: true, Name: "a", Value: "a value"},
 		}
-		c := []Matcher{
+		c := []matcher{
 			{IsRegex: true, Name: "a", Value: "b value"},
 		}
 
@@ -86,10 +86,10 @@ func TestMatchersCompare(t *testing.T) {
 	})
 
 	t.Run("true", func(t *testing.T) {
-		a := []Matcher{
+		a := []matcher{
 			{IsRegex: true, Name: "a", Value: "a value"},
 		}
-		c := []Matcher{
+		c := []matcher{
 			{IsRegex: true, Name: "a", Value: "a value"},
 		}
 
@@ -102,21 +102,21 @@ func TestMatchersCompare(t *testing.T) {
 
 func TestCompareSilences(t *testing.T) {
 	t.Run("not found", func(t *testing.T) {
-		d := []ScheduledSilence{
-			{Matchers: []Matcher{
+		d := []scheduledSilence{
+			{Matchers: []matcher{
 				{IsRegex: false, Name: "a", Value: "a value"},
 				{IsRegex: true, Name: "b", Value: "b value"}},
 			},
 		}
 
-		a := []AlertmanagerSilence{
-			{Matchers: []Matcher{
+		a := []alertmanagerSilence{
+			{Matchers: []matcher{
 				{IsRegex: false, Name: "a", Value: "a value"}},
 			},
 		}
 
-		want := []AlertmanagerSilence{
-			{Matchers: []Matcher{
+		want := []alertmanagerSilence{
+			{Matchers: []matcher{
 				{IsRegex: false, Name: "a", Value: "a value"},
 				{IsRegex: true, Name: "b", Value: "b value"},
 			}},
@@ -131,18 +131,18 @@ func TestCompareSilences(t *testing.T) {
 	})
 
 	t.Run("found", func(t *testing.T) {
-		d := []ScheduledSilence{
-			{Matchers: []Matcher{
+		d := []scheduledSilence{
+			{Matchers: []matcher{
 				{IsRegex: false, Name: "a", Value: "a value"}},
 			},
 		}
-		a := []AlertmanagerSilence{
-			{Matchers: []Matcher{
+		a := []alertmanagerSilence{
+			{Matchers: []matcher{
 				{IsRegex: false, Name: "a", Value: "a value"}},
 			}}
 
-		want := []AlertmanagerSilence{
-			{Matchers: []Matcher{
+		want := []alertmanagerSilence{
+			{Matchers: []matcher{
 				{IsRegex: false, Name: "a", Value: "a value"},
 			}},
 		}

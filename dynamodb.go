@@ -1,6 +1,6 @@
 package main
 
-/*func getSilencesFromInputEvent(svc dynamodbiface.DynamoDBAPI) ([]ScheduledSilence, error) {
+/*func getSilencesFromInputEvent(svc dynamodbiface.DynamoDBAPI) ([]scheduledSilence, error) {
 	scheduleTableName := "Alertmanager-Scheduled-Silences"
 
 	input := &dynamodb.ScanInput{
@@ -27,7 +27,7 @@ package main
 	}
 	log.Debug("found records in DynamoDB:\n", result)
 
-	records := []ScheduledSilence{}
+	records := []scheduledSilence{}
 	if err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &records); err != nil {
 		return nil, err
 	}
