@@ -19,13 +19,13 @@ func sortMatchers(m []Matcher) {
 		})
 }
 
-// compareSilences compares dynamo db records to alert manager records
-func compareSilences(a []AlertmanagerSilence, d []Record) []AlertmanagerSilence {
+// compareSilences compares event submitted silences to active alert manager silences
+func compareSilences(a []AlertmanagerSilence, d []ScheduledSilence) []AlertmanagerSilence {
 	newSilences := []AlertmanagerSilence{}
 
-	/* for each silence in dynamo slice
-	   check if it's in alert manager slice
-	   if not - add to newSilences list - otherwise, continue */
+	/* for each silence in scheduled silences
+	   check if it's in alert manager silences
+	   if not - add to newSilences slice - otherwise, continue */
 
 	for _, dv := range d {
 		found := false

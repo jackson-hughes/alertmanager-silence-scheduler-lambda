@@ -1,0 +1,36 @@
+[
+    {
+        "Service": "ExampleService",
+        "StartScheduleCron": "0 3 * * 0",
+        "EndScheduleCron": "0 4 * * 0",
+        "Matchers": [
+            {
+                "IsRegex": false,
+                "Name": "environment",
+                "Value": "test"
+            },
+            {
+                "IsRegex": false,
+                "Name": "alertname",
+                "Value": "HostDown"
+            }
+        ]
+    },
+    {
+        "Service": "ExampleServiceTwo",
+        "StartScheduleCron": "0 8 * * 0",
+        "EndScheduleCron": "0 9 * * 0",
+        "Matchers": [
+            {
+                "IsRegex": false,
+                "Name": "environment",
+                "Value": "prod"
+            },
+            {
+                "IsRegex": false,
+                "Name": "alertname",
+                "Value": "LambdaError"
+            }
+        ]
+    }
+]

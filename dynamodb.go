@@ -1,34 +1,8 @@
 package main
 
-import (
-	"encoding/json"
-	"time"
-
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
-	log "github.com/sirupsen/logrus"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-)
-
-type Record struct {
-	Service           string
-	StartScheduleCron string
-	EndScheduleCron   string
-	Matchers          []Matcher
-	StartsAt          time.Time
-	EndsAt            time.Time
-}
-
-func getScheduledSilences() ([]Record, error) {
+/*func getSilencesFromInputEvent(svc dynamodbiface.DynamoDBAPI) ([]ScheduledSilence, error) {
 	scheduleTableName := "Alertmanager-Scheduled-Silences"
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-	}))
 
-	svc := dynamodb.New(sess)
 	input := &dynamodb.ScanInput{
 		TableName: aws.String(scheduleTableName),
 	}
@@ -53,7 +27,7 @@ func getScheduledSilences() ([]Record, error) {
 	}
 	log.Debug("found records in DynamoDB:\n", result)
 
-	records := []Record{}
+	records := []ScheduledSilence{}
 	if err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &records); err != nil {
 		return nil, err
 	}
@@ -79,4 +53,4 @@ func getScheduledSilences() ([]Record, error) {
 
 	log.Debug("Records:\n", string(recordsPretty))
 	return records, nil
-}
+}*/

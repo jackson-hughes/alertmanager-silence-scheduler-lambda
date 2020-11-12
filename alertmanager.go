@@ -20,6 +20,15 @@ type Matcher struct {
 	Value   string `json:"value"`
 }
 
+type ScheduledSilence struct {
+	Service           string
+	StartScheduleCron string
+	EndScheduleCron   string
+	Matchers          []Matcher
+	StartsAt          time.Time
+	EndsAt            time.Time
+}
+
 type AlertmanagerSilence struct {
 	Id        string    `json:"id"`
 	Status    Status    `json:"status"`
@@ -32,12 +41,10 @@ type AlertmanagerSilence struct {
 }
 
 // getSilences retrieves all silences from AlertManager
-func getSilences() ([]AlertmanagerSilence, error) {
-	apiUrl := alertmanagerBaseUrl + silencesApiUrl
-
+func getSilences(alertManagerUrl string) ([]AlertmanagerSilence, error) {
 	var allSilences []AlertmanagerSilence // existing silences includes all states (e.g. expired)
 
-	resp, err := http.Get("http://" + apiUrl)
+	resp, err := http.Get("http://" + alertManagerUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -76,18 +83,18 @@ func getActiveSilences(silences []AlertmanagerSilence) ([]AlertmanagerSilence, e
 }
 
 // putSilence takes an AlertManager silence and PUTs it into Alertmanager over http
-func putSilence(s AlertmanagerSilence) error {
-	apiUrl := alertmanagerBaseUrl + silencesApiUrl // dupe clean up later
-
+func putSilence(alertManagerUrl string, s AlertmanagerSilence) error {
 	b, err := json.MarshalIndent(s, "", "    ")
 
 	log.Debug("posting new silence to alert manager:\n", string(b))
-	resp, err := http.Post("http://"+apiUrl, "application/json", bytes.NewBuffer(b))
+	resp, err := http.Post("http://"+alertManagerUrl, "application/json", bytes.NewBuffer(b))
 	if err != nil {
 		return err
 	}
 	log.Debug("alertmanager response code: ", resp.Status)
-	log.Debug("alertmanager response body: ", resp.Body)
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(resp.Body)
+	log.Debug("alertmanager response body: ", buf.String())
 	defer resp.Body.Close()
 	return nil
 }
