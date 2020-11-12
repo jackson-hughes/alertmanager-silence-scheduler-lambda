@@ -52,12 +52,12 @@ func (m *mockDynamoDBClient) Scan(input *dynamodb.ScanInput) (*dynamodb.ScanOutp
 
 	testRecordStartTime, _ := time.Parse(time.RFC3339, "2020-08-09T03:00:00Z")
 	testRecordEndTime, _ := time.Parse(time.RFC3339, "2020-08-09T04:00:00Z")
-	// items := []ScheduledSilence{}
-	r := ScheduledSilence{
+	// items := []scheduledSilence{}
+	r := scheduledSilence{
 		Service:           "test",
 		StartScheduleCron: "0 3 * * 0",
 		EndScheduleCron:   "0 4 * * 0",
-		Matchers: []Matcher{
+		Matchers: []matcher{
 			{
 				IsRegex: false,
 				Name:    "environment",
@@ -87,12 +87,12 @@ func (m *mockDynamoDBClient) Scan(input *dynamodb.ScanInput) (*dynamodb.ScanOutp
 	testRecordStartTime, _ := time.Parse(time.RFC3339, "2020-08-09T03:00:00Z")
 	testRecordEndTime, _ := time.Parse(time.RFC3339, "2020-08-09T04:00:00Z")
 
-	want := []ScheduledSilence{
+	want := []scheduledSilence{
 		{
 			Service:           "test",
 			StartScheduleCron: "0 3 * * 0",
 			EndScheduleCron:   "0 4 * * 0",
-			Matchers: []Matcher{
+			Matchers: []matcher{
 				{
 					IsRegex: false,
 					Name:    "environment",

@@ -10,8 +10,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func getSilencesFromInputEvent(jsonSilencesInput []byte) ([]ScheduledSilence, error) {
-	silences := []ScheduledSilence{}
+func getSilencesFromInputEvent(jsonSilencesInput []byte) ([]scheduledSilence, error) {
+	silences := []scheduledSilence{}
 	if err := json.Unmarshal(jsonSilencesInput, &silences); err != nil {
 		return silences, err
 	}
@@ -46,7 +46,7 @@ func handleRequest(ctx context.Context, event events.CloudWatchEvent) {
 	}
 
 	// get existing silences from alertmanager
-	alertManagerSilences, err := getSilences(alertManagerUrl)
+	alertManagerSilences, err := getSilences(alertManagerURL)
 	if err != nil {
 		log.Error(err)
 	}
@@ -56,13 +56,12 @@ func handleRequest(ctx context.Context, event events.CloudWatchEvent) {
 	if len(s) == 0 {
 		log.Info("no new silences to be added to alert manager")
 		return
-	} else {
-		log.Debugf("New silences to be added to alert manager: %+v", s)
 	}
+	log.Debugf("New silences to be added to alert manager: %+v", s)
 
 	// post any new silences to alertmanager
 	for _, v := range s {
-		if err := putSilence(alertManagerUrl, v); err != nil {
+		if err := putSilence(alertManagerURL, v); err != nil {
 			log.Error(err)
 		}
 	}

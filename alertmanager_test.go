@@ -46,15 +46,15 @@ func TestGetActiveSilences(t *testing.T) {
     }]`
 	log.Trace(testSilencesTwo)
 
-	testSilences := []AlertmanagerSilence{
-		{Id: "1", Status: Status{"pending"}},
-		{Id: "2", Status: Status{"active"}},
-		{Id: "3", Status: Status{"expired"}},
+	testSilences := []alertmanagerSilence{
+		{ID: "1", Status: status{"pending"}},
+		{ID: "2", Status: status{"active"}},
+		{ID: "3", Status: status{"expired"}},
 	}
 
-	want := []AlertmanagerSilence{
-		{Id: "1", Status: Status{"pending"}},
-		{Id: "2", Status: Status{"active"}},
+	want := []alertmanagerSilence{
+		{ID: "1", Status: status{"pending"}},
+		{ID: "2", Status: status{"active"}},
 	}
 
 	got, err := getActiveSilences(testSilences)

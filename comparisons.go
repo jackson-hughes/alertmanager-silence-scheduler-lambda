@@ -8,7 +8,7 @@ import (
 )
 
 // sortMatchers takes matcher and returns matcher with sorted key values
-func sortMatchers(m []Matcher) {
+func sortMatchers(m []matcher) {
 	sort.SliceStable(m,
 		func(i, j int) bool {
 			result := strings.Compare(m[i].Name, m[j].Name)
@@ -20,8 +20,8 @@ func sortMatchers(m []Matcher) {
 }
 
 // compareSilences compares event submitted silences to active alert manager silences
-func compareSilences(a []AlertmanagerSilence, d []ScheduledSilence) []AlertmanagerSilence {
-	newSilences := []AlertmanagerSilence{}
+func compareSilences(a []alertmanagerSilence, d []scheduledSilence) []alertmanagerSilence {
+	newSilences := []alertmanagerSilence{}
 
 	/* for each silence in scheduled silences
 	   check if it's in alert manager silences
@@ -37,7 +37,7 @@ func compareSilences(a []AlertmanagerSilence, d []ScheduledSilence) []Alertmanag
 		}
 		if !found {
 			log.Debug("Didn't find existing silence - creating a new silence for: ", dv.Matchers)
-			newSilences = append(newSilences, AlertmanagerSilence{
+			newSilences = append(newSilences, alertmanagerSilence{
 				Comment:   "Silencing for regular maintenance window",
 				CreatedBy: "Silence Scheduler Lambda",
 				StartsAt:  dv.StartsAt,
@@ -50,7 +50,7 @@ func compareSilences(a []AlertmanagerSilence, d []ScheduledSilence) []Alertmanag
 }
 
 // matchersCompare tests if two slices of matchers are equal. True is equal - false is not
-func matchersCompare(a, d []Matcher) bool {
+func matchersCompare(a, d []matcher) bool {
 
 	if len(a) != len(d) {
 		return false

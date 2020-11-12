@@ -7,9 +7,9 @@ import (
 )
 
 var (
-	silencesApiUrl      string = "/api/v2/silences/"
-	alertmanagerBaseUrl string = "localhost:9093"
-	alertManagerUrl     string = alertmanagerBaseUrl + silencesApiUrl
+	silencesAPIURL      = "/api/v2/silences/"
+	alertManagerBaseURL = "localhost:9093"
+	alertManagerURL     = alertManagerBaseURL + silencesAPIURL
 )
 
 func init() {
@@ -31,15 +31,15 @@ func init() {
 		log.Debug("log level environment variable found: ", envLogLevel)
 	}
 
-	envAlertmanagerUrl, set := os.LookupEnv("ALERTMANAGER_URL")
+	envAlertManagerURL, set := os.LookupEnv("ALERTMANAGER_URL")
 	if set {
-		alertmanagerBaseUrl = envAlertmanagerUrl
-		log.Debug("alertmanager url environment variable found: ", alertmanagerBaseUrl)
+		alertManagerBaseURL = envAlertManagerURL
+		log.Debug("alertmanager url environment variable found: ", alertManagerBaseURL)
 	}
 
-	envAlertManagerSilencesApiUrl, set := os.LookupEnv("ALERTMANAGER_SILENCE_API_URL")
+	envAlertManagerSilencesAPIURL, set := os.LookupEnv("ALERTMANAGER_SILENCE_API_URL")
 	if set {
-		silencesApiUrl = envAlertManagerSilencesApiUrl
-		log.Debug("silence api url environment variable found: ", silencesApiUrl)
+		silencesAPIURL = envAlertManagerSilencesAPIURL
+		log.Debug("silence api url environment variable found: ", silencesAPIURL)
 	}
 }
