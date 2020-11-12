@@ -102,7 +102,7 @@ func TestMatchersCompare(t *testing.T) {
 
 func TestCompareSilences(t *testing.T) {
 	t.Run("not found", func(t *testing.T) {
-		d := []Record{
+		d := []ScheduledSilence{
 			{Matchers: []Matcher{
 				{IsRegex: false, Name: "a", Value: "a value"},
 				{IsRegex: true, Name: "b", Value: "b value"}},
@@ -131,7 +131,7 @@ func TestCompareSilences(t *testing.T) {
 	})
 
 	t.Run("found", func(t *testing.T) {
-		d := []Record{
+		d := []ScheduledSilence{
 			{Matchers: []Matcher{
 				{IsRegex: false, Name: "a", Value: "a value"}},
 			},

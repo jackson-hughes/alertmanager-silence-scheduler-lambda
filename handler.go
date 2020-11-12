@@ -2,35 +2,67 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"time"
+
+	"github.com/aws/aws-lambda-go/events"
 
 	log "github.com/sirupsen/logrus"
 )
 
-func handler(ctx context.Context) {
-	alertManagerSilences, err := getSilences()
-	if err != nil {
-		log.Error(err)
+func getSilencesFromInputEvent(jsonSilencesInput []byte) ([]ScheduledSilence, error) {
+	silences := []ScheduledSilence{}
+	if err := json.Unmarshal(jsonSilencesInput, &silences); err != nil {
+		return silences, err
 	}
+	return silences, nil
+}
 
-	scheduledSilences, err := getScheduledSilences()
+func handleRequest(ctx context.Context, event events.CloudWatchEvent) {
+	// get user submitted silences from event input
+	scheduledSilences, err := getSilencesFromInputEvent(event.Detail)
+	log.Debug("scheduled silences: ", string(event.Detail))
 	if err != nil {
 		log.Error(err)
 	}
 	if scheduledSilences == nil {
-		log.Info("No scheduled silences found in database table")
+		log.Info("no scheduled silences from event")
 		return
 	}
-	s := compareSilences(alertManagerSilences, scheduledSilences)
 
+	// parse cron schedules into next invocation times and append to struct field
+	for i := 0; i < len(scheduledSilences); i++ {
+		k := &scheduledSilences[i]
+		startTime, err := parseCronSchedule(k.StartScheduleCron, time.Now().UTC())
+		if err != nil {
+			log.Error(err)
+		}
+		k.StartsAt = startTime
+		endTime, err := parseCronSchedule(k.EndScheduleCron, time.Now().UTC())
+		if err != nil {
+			log.Error(err)
+		}
+		k.EndsAt = endTime
+	}
+
+	// get existing silences from alertmanager
+	alertManagerSilences, err := getSilences(alertManagerUrl)
+	if err != nil {
+		log.Error(err)
+	}
+
+	// compare event silences and existing silences
+	s := compareSilences(alertManagerSilences, scheduledSilences)
 	if len(s) == 0 {
 		log.Info("no new silences to be added to alert manager")
 		return
 	} else {
-		log.Infof("New silences to be added to alert manager: %+v", s)
+		log.Debugf("New silences to be added to alert manager: %+v", s)
 	}
 
+	// post any new silences to alertmanager
 	for _, v := range s {
-		if err := putSilence(v); err != nil {
+		if err := putSilence(alertManagerUrl, v); err != nil {
 			log.Error(err)
 		}
 	}
