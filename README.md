@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/jhughes01/alertmanager-silence-scheduler-lambda)](https://goreportcard.com/report/github.com/jhughes01/alertmanager-silence-scheduler-lambda)
+
 # Alert Manager Silence Scheduler
 
 This utility is... and does...
