@@ -40,8 +40,8 @@ type alertmanagerSilence struct {
 	Matchers  []matcher `json:"matchers"`
 }
 
-// getSilences retrieves all silences from AlertManager
-func getSilences(alertManagerURL string) ([]alertmanagerSilence, error) {
+// getAlertManagerSilences retrieves all silences from AlertManager
+func getAlertManagerSilences(alertManagerURL string) ([]alertmanagerSilence, error) {
 	var allSilences []alertmanagerSilence // existing silences includes all states (e.g. expired)
 
 	resp, err := http.Get("http://" + alertManagerURL)
@@ -58,15 +58,17 @@ func getSilences(alertManagerURL string) ([]alertmanagerSilence, error) {
 	if err != nil {
 		return nil, err
 	}
-	return getActiveSilences(allSilences)
+	return filterAlertManagerSilences(allSilences)
 }
 
-// getActiveSilences sorts through a slice of AlertManager silences removing any that have expired
-func getActiveSilences(silences []alertmanagerSilence) ([]alertmanagerSilence, error) {
-	var activeSilences []alertmanagerSilence
+func filterAlertManagerSilences(silences []alertmanagerSilence, filterString ...string) ([]alertmanagerSilence, error) {
+	activeSilences := []alertmanagerSilence{}
+
 	for _, s := range silences {
-		if s.Status.State == "active" || s.Status.State == "pending" {
-			activeSilences = append(activeSilences, s)
+		for i, _ := range filterString {
+			if s.Status.State == filterString[i] {
+				activeSilences = append(activeSilences, s)
+			}
 		}
 	}
 	if len(activeSilences) > 0 {
@@ -82,19 +84,24 @@ func getActiveSilences(silences []alertmanagerSilence) ([]alertmanagerSilence, e
 	return activeSilences, nil
 }
 
-// putSilence takes an AlertManager silence and PUTs it into Alertmanager over http
-func putSilence(alertManagerURL string, s alertmanagerSilence) error {
+// putAlertManagerSilence takes an AlertManager silence and PUTs it into Alertmanager over http
+func putAlertManagerSilence(alertManagerURL string, s alertmanagerSilence) error {
 	b, err := json.MarshalIndent(s, "", "    ")
 
 	log.Debug("posting new silence to alert manager:\n", string(b))
+
 	resp, err := http.Post("http://"+alertManagerURL, "application/json", bytes.NewBuffer(b))
 	if err != nil {
 		return err
 	}
+
 	log.Debug("alertmanager response code: ", resp.Status)
+
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(resp.Body)
+
 	log.Debug("alertmanager response body: ", buf.String())
+
 	defer resp.Body.Close()
 	return nil
 }

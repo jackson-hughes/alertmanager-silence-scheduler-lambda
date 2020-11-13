@@ -46,7 +46,7 @@ func handleRequest(ctx context.Context, event events.CloudWatchEvent) {
 	}
 
 	// get existing silences from alertmanager
-	alertManagerSilences, err := getSilences(alertManagerURL)
+	alertManagerSilences, err := getAlertManagerSilences(alertManagerURL)
 	if err != nil {
 		log.Error(err)
 	}
@@ -61,7 +61,7 @@ func handleRequest(ctx context.Context, event events.CloudWatchEvent) {
 
 	// post any new silences to alertmanager
 	for _, v := range s {
-		if err := putSilence(alertManagerURL, v); err != nil {
+		if err := putAlertManagerSilence(alertManagerURL, v); err != nil {
 			log.Error(err)
 		}
 	}

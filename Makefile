@@ -12,11 +12,13 @@ build:
 run:
 	go run ./...
 
-test: build
+test:
 	go test -v -cover -race
 
-integration-test: build start-alert-manager
-	go test -v -cover -race -tags=integration; docker stop amsilenceschedulertest; docker rm amsilenceschedulertest
+integration-test: start-alert-manager
+	go test -v -cover -race -tags=integration; \
+    docker stop amsilenceschedulertest; \
+    docker rm amsilenceschedulertest
 
 start-alert-manager:
 	docker run -d --name amsilenceschedulertest -p 9093:9093 prom/alertmanager:v0.21.0

@@ -1,4 +1,4 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/jhughes01/alertmanager-silence-scheduler-lambda)](https://goreportcard.com/report/github.com/jhughes01/alertmanager-silence-scheduler-lambda)
+[![Go Report Card](https://goreportcard.com/badge/github.com/jhughes01/alertmanager-silence-scheduler-lambda)](https://goreportcard.com/report/github.com/jhughes01/alertmanager-silence-scheduler-lambda)  
 
 # Alert Manager Silence Scheduler
 
@@ -14,6 +14,16 @@ There's a simple `Makefile` provided which exposes the following functions:
 *   `stop-alert-manager`: removes any background Alert Manager docker processes
 *   `zip`: produces a tagged zip archive
 *   `clean`: removes all local build artifacts from disk 
+
+### Testing
+
+To run the unit tests:
+
+    make test
+    
+To run the 'integration' tests (i.e. a full run against a dockerised AlertManager backend - requires docker):
+
+    make integration-test
 
 ## Deployment
 

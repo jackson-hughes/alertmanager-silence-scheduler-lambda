@@ -23,7 +23,7 @@ func sortMatchers(m []matcher) {
 func compareSilences(a []alertmanagerSilence, d []scheduledSilence) []alertmanagerSilence {
 	newSilences := []alertmanagerSilence{}
 
-	/* for each silence in scheduled silences
+	/* for each silence in input event silences
 	   check if it's in alert manager silences
 	   if not - add to newSilences slice - otherwise, continue */
 
@@ -38,7 +38,7 @@ func compareSilences(a []alertmanagerSilence, d []scheduledSilence) []alertmanag
 		if !found {
 			log.Debug("Didn't find existing silence - creating a new silence for: ", dv.Matchers)
 			newSilences = append(newSilences, alertmanagerSilence{
-				Comment:   "Silencing for regular maintenance window",
+				Comment:   "Automated silence entry",
 				CreatedBy: "Silence Scheduler Lambda",
 				StartsAt:  dv.StartsAt,
 				EndsAt:    dv.EndsAt,
