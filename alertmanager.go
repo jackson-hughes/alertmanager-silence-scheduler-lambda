@@ -65,7 +65,7 @@ func filterAlertManagerSilences(silences []alertmanagerSilence, filterString ...
 	activeSilences := []alertmanagerSilence{}
 
 	for _, s := range silences {
-		for i, _ := range filterString {
+		for i := range filterString {
 			if s.Status.State == filterString[i] {
 				activeSilences = append(activeSilences, s)
 			}
