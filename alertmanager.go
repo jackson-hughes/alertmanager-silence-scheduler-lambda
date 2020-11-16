@@ -58,7 +58,7 @@ func getAlertManagerSilences(alertManagerURL string) ([]alertmanagerSilence, err
 	if err != nil {
 		return nil, err
 	}
-	return filterAlertManagerSilences(allSilences)
+	return filterAlertManagerSilences(allSilences, "active", "pending")
 }
 
 func filterAlertManagerSilences(silences []alertmanagerSilence, filterString ...string) ([]alertmanagerSilence, error) {

@@ -51,7 +51,7 @@ func handleRequest(ctx context.Context, event events.CloudWatchEvent) {
 		log.Error(err)
 	}
 
-	// compare event silences and existing silences
+	// compare existing silences and event silences
 	s := compareSilences(alertManagerSilences, scheduledSilences)
 	if len(s) == 0 {
 		log.Info("no new silences to be added to alert manager")
