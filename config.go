@@ -34,5 +34,10 @@ func init() {
 		log.Error("error parsing log level: ", err)
 	}
 	log.SetLevel(LogLevelType)
-	log.Debug("log level setting: ", appConfig.LogLevel)
+	log.Debug("log level: ", appConfig.LogLevel)
+	log.Debug("alertmanager base url: ", appConfig.AlertManagerUrl)
+	log.Debug("alertmanager silence api url: ", appConfig.AlertManagerSilenceApiUrl)
+	log.Debug("alertmanager port: ", appConfig.AlertManagerTcpPort)
+	log.Debug("alertmanager full url: ", appConfig.AlertManagerUrl+":"+appConfig.AlertManagerTcpPort+appConfig.AlertManagerSilenceApiUrl)
+
 }
