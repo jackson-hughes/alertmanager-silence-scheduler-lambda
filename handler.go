@@ -25,7 +25,7 @@ func handleRequest(ctx context.Context, event events.CloudWatchEvent) {
 	scheduledSilences, err := getSilencesFromInputEvent(event.Detail)
 	log.Debug("scheduled silences: ", string(event.Detail))
 	if err != nil {
-		log.Error(err)
+		log.Error("error unmarshalling input silences into object: \n", string(event.Detail), "\n", err)
 	}
 	if scheduledSilences == nil {
 		log.Info("no scheduled silences from event")
