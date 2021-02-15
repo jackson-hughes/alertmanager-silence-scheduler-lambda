@@ -37,12 +37,12 @@ func handleRequest(ctx context.Context, event events.CloudWatchEvent) {
 		k := &scheduledSilences[i]
 		startTime, err := parseCronSchedule(k.StartScheduleCron, time.Now().UTC())
 		if err != nil {
-			log.Error(err)
+			log.Errorf("error parsing silence start time from cron input: %s \n %s", k.StartScheduleCron, err)
 		}
 		k.StartsAt = startTime
 		endTime, err := parseCronSchedule(k.EndScheduleCron, time.Now().UTC())
 		if err != nil {
-			log.Error(err)
+			log.Errorf("error parsing silence end time from cron input: %s \n %s", k.EndScheduleCron, err)
 		}
 		k.EndsAt = endTime
 	}
@@ -50,7 +50,7 @@ func handleRequest(ctx context.Context, event events.CloudWatchEvent) {
 	// get existing silences from alertmanager
 	alertManagerSilences, err := getAlertManagerSilences(alertManagerFullUrl)
 	if err != nil {
-		log.Error(err)
+		log.Error("error getting existing silences from alertmanager api: ", err)
 	}
 
 	// compare existing silences and event silences
