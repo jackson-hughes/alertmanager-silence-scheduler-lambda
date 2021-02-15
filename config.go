@@ -34,6 +34,7 @@ func init() {
 	envAlertManagerURL, set := os.LookupEnv("ALERTMANAGER_URL")
 	if set {
 		alertManagerBaseURL = envAlertManagerURL
+		alertManagerURL = alertManagerBaseURL + silencesAPIURL
 		log.Debug("alertmanager url environment variable found: ", alertManagerBaseURL)
 	}
 
