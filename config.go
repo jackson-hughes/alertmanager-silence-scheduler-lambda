@@ -9,7 +9,8 @@ import (
 var (
 	silencesAPIURL      = "/api/v2/silences/"
 	alertManagerBaseURL = "localhost:9093"
-	alertManagerURL     = alertManagerBaseURL + silencesAPIURL
+	alertManagerTcpPort = "9093"
+	alertManagerURL     = alertManagerBaseURL + alertManagerTcpPort + silencesAPIURL
 )
 
 func init() {
@@ -34,7 +35,7 @@ func init() {
 	envAlertManagerURL, set := os.LookupEnv("ALERTMANAGER_URL")
 	if set {
 		alertManagerBaseURL = envAlertManagerURL
-		alertManagerURL = alertManagerBaseURL + silencesAPIURL
+		alertManagerURL = alertManagerBaseURL + alertManagerTcpPort + silencesAPIURL
 		log.Debug("alertmanager url environment variable found: ", alertManagerBaseURL)
 	}
 
