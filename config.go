@@ -1,16 +1,19 @@
 package main
 
 import (
-	"os"
-
+	"github.com/kelseyhightower/envconfig"
 	log "github.com/sirupsen/logrus"
 )
 
+type Specification struct {
+	LogLevel                  string `default:"info"`
+	AlertManagerUrl           string `default:"localhost"`
+	AlertManagerTcpPort       string `default:"9093"`
+	AlertManagerSilenceApiUrl string `default:"/api/v2/silences/"`
+}
+
 var (
-	silencesAPIURL      = "/api/v2/silences/"
-	alertManagerBaseURL = "localhost:9093"
-	alertManagerTcpPort = "9093"
-	alertManagerURL     = alertManagerBaseURL + ":" + alertManagerTcpPort + silencesAPIURL
+	appConfig Specification
 )
 
 func init() {
@@ -21,27 +24,15 @@ func init() {
 		TimestampFormat:        "2006-02-01 15:04:05",
 	})
 
-	// environment variables for app configuration
-	envLogLevel, set := os.LookupEnv("LOG_LEVEL")
-	if set {
-		envLogLevelString, err := log.ParseLevel(envLogLevel)
-		if err != nil {
-			log.Error(err)
-		}
-		log.SetLevel(envLogLevelString)
-		log.Debug("log level environment variable found: ", envLogLevel)
+	err := envconfig.Process("amsilencer", &appConfig)
+	if err != nil {
+		log.Fatal("error initialising application configuration: ", err)
 	}
 
-	envAlertManagerURL, set := os.LookupEnv("ALERTMANAGER_URL")
-	if set {
-		alertManagerBaseURL = envAlertManagerURL
-		alertManagerURL = alertManagerBaseURL + ":" + alertManagerTcpPort + silencesAPIURL
-		log.Debug("alertmanager url environment variable found: ", alertManagerBaseURL)
+	LogLevelType, err := log.ParseLevel(appConfig.LogLevel)
+	if err != nil {
+		log.Error("error parsing log level: ", err)
 	}
-
-	envAlertManagerSilencesAPIURL, set := os.LookupEnv("ALERTMANAGER_SILENCE_API_URL")
-	if set {
-		silencesAPIURL = envAlertManagerSilencesAPIURL
-		log.Debug("silence api url environment variable found: ", silencesAPIURL)
-	}
+	log.SetLevel(LogLevelType)
+	log.Debug("log level setting: ", appConfig.LogLevel)
 }

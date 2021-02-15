@@ -13,6 +13,8 @@ import (
 )
 
 func TestHandleRequest(t *testing.T) {
+	alertManagerFullUrl := appConfig.AlertManagerUrl + ":" + appConfig.AlertManagerTcpPort + appConfig.AlertManagerSilenceApiUrl
+
 	// test JSON input
 	testJsonInput := `[
     {
@@ -66,7 +68,7 @@ func TestHandleRequest(t *testing.T) {
 	handleRequest(context.TODO(), testEvent)
 
 	// query alertmanager for silences
-	resp, err := http.Get("http://" + alertManagerURL)
+	resp, err := http.Get("http://" + alertManagerFullUrl)
 	if err != nil {
 		t.Error(err)
 	}

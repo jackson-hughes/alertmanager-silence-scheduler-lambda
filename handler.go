@@ -19,6 +19,8 @@ func getSilencesFromInputEvent(jsonSilencesInput []byte) ([]scheduledSilence, er
 }
 
 func handleRequest(ctx context.Context, event events.CloudWatchEvent) {
+	alertManagerFullUrl := appConfig.AlertManagerUrl + ":" + appConfig.AlertManagerTcpPort + appConfig.AlertManagerSilenceApiUrl
+
 	// get user submitted silences from event input
 	scheduledSilences, err := getSilencesFromInputEvent(event.Detail)
 	log.Debug("scheduled silences: ", string(event.Detail))
@@ -46,7 +48,7 @@ func handleRequest(ctx context.Context, event events.CloudWatchEvent) {
 	}
 
 	// get existing silences from alertmanager
-	alertManagerSilences, err := getAlertManagerSilences(alertManagerURL)
+	alertManagerSilences, err := getAlertManagerSilences(alertManagerFullUrl)
 	if err != nil {
 		log.Error(err)
 	}
@@ -61,7 +63,7 @@ func handleRequest(ctx context.Context, event events.CloudWatchEvent) {
 
 	// post any new silences to alertmanager
 	for _, v := range s {
-		if err := putAlertManagerSilence(alertManagerURL, v); err != nil {
+		if err := putAlertManagerSilence(alertManagerFullUrl, v); err != nil {
 			log.Error(err)
 		}
 	}
